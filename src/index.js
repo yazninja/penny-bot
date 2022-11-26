@@ -51,7 +51,7 @@ client.on("guildMemberAdd", async (member) => {
         .setColor('Random')
         .setTitle(`Welcome to ${member.guild.name}!`)
         .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 512 }))
-        .setDescription(`I am Penny and welcome to the server, <@${member.user.id}>. Please read the rules and regulations in ${rule} and introduce yourselves in ${member.guild.channels.cache.get(intro).toString()}`)
+        .setDescription(`I am Penny and welcome to the server, <@${member.user.id}>. Please read the rules and regulations in <#${process.env.RULE_CHANNEL}> and introduce yourselves in <#${process.env.INTRO_CHANNEL}>!`)
         .setFooter({ text: "Have Fun!", iconURL: interaction.member.user.avatarURL() })
     await channel.send({ embeds: [newEmbed] });
 });
