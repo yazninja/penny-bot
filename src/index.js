@@ -3,9 +3,11 @@ import consola from 'consola';
 import { Client, GatewayIntentBits, ActivityType, Collection, Partials, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from "discord.js";
 import { Player } from 'discord-player';
 import { readdirSync } from 'fs';
+import { getColorFromURL } from 'color-thief-node';
 import { getAPIToken } from "./integrations/musickitAPI.js";
 let prompts = (await import("./data/prompts.json", { assert: { type: "json" } })).default;
 let reassure = (await import("./data/reassurance.json", { assert: { type: "json" } })).default;
+let welcome = (await import("./data/welcome.json", { assert: { type: "json" } })).default;
 
 const client = new Client({
     intents: [
@@ -42,17 +44,26 @@ for (const folder of commandFolders) {
 client.on("ready", () => {
     consola.success(`Logged in as ${client.user.tag} at ${Date()}`);
     client.user.setActivity(`Writers Guild`, { type: ActivityType.Listening });
+
 });
 
+function sendWelcomeMessgae(id) {
+
+}
+
+
+
 client.on("guildMemberAdd", async (member) => {
-    console.log(member);
     const channel = member.guild.channels.cache.get(process.env.WELCOME_CHANNEL);
     const newEmbed = new EmbedBuilder()
-        .setColor('Random')
-        .setTitle(`Welcome to ${member.guild.name}!`)
+        .setColor(await getColorFromURL(member.user.avatarURL({extension: 'png', size: 128})))
+        .setAuthor({
+            name: `Welcome to ${member.guild.name}!`,
+            iconURL: client.user.avatarURL(),
+        })
         .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 512 }))
         .setDescription(`I am Penny and welcome to the server, <@${member.user.id}>. Please read the rules and regulations in <#${process.env.RULE_CHANNEL}> and introduce yourselves in <#${process.env.INTRO_CHANNEL}>!`)
-        .setFooter({ text: "Have Fun!", iconURL: interaction.member.user.avatarURL() })
+        .setFooter({ text: welcome[Math.floor(Math.random() * welcome.length)], iconURL: member.guild.iconURL() })
     await channel.send({ embeds: [newEmbed] });
 });
 
