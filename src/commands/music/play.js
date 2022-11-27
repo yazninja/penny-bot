@@ -1,8 +1,10 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { MusicKit as MusicKitHeader } from '../../data/headers.js';
 import fetch from 'node-fetch';
-import { QueryType } from 'discord-player';
-import { stream } from 'play-dl'
+import { QueryType, Track } from 'discord-player';
+import { default as prettyMS } from 'pretty-ms';
+
+import { stream, soundcloud, authorization, SoundCloudTrack, SoundCloudPlaylist } from 'play-dl'
 import { searchMusics } from 'node-youtube-music';
 import 'dotenv/config';
 
@@ -31,11 +33,16 @@ export const command = {
                 votestop: 0,
             },
             async onBeforeCreateStream(track, source, _queue) {
+                console.log(track, source, _queue);
                 // only trap youtube source
+
                 if (source === "youtube") {
                     // track here would be youtube track
                     return (await stream(track.url, { discordPlayerCompatibility: true })).stream;
                     // we must return readable stream or void (returning void means telling discord-player to look for default extractor)
+                }
+                else if (source === "soundcloud") {
+                    return (await stream(track.url, { discordPlayerCompatibility: true })).stream;
                 }
             }
         });
@@ -111,6 +118,7 @@ export const command = {
             await interaction.reply(`Parsing \`${query}\` from YouTube`);
 
             const searchResult = await player.search(query, { requestedBy: interaction.user, searchEngine: QueryType.AUTO })
+            console.log(searchResult.raw);
             if (!searchResult) return await interaction.followUp({ content: `❌ | Cannot find \`${query}\` in youtube` });
             await interaction.editReply(`Adding ${searchResult.playlist ? `**${searchResult.playlist.title}** with \`${searchResult.tracks.length}\` tracks to the queue` : `**${searchResult.tracks[0].title}** to the queue`}`)
             searchResult.tracks.forEach(track => {
@@ -123,6 +131,25 @@ export const command = {
             }
             else queue.addTrack(searchResult.tracks);
             if (!searchResult.playlist) await interaction.editReply(`Added **${searchResult.tracks[0].title}** to the queue`);
+        } else if (query.startsWith('https://soundcloud.com/')) {
+            await interaction.reply(`Connecting to SoundCloud API...`);
+            // await authorization('y')
+            let sound = await soundcloud(query)
+            await interaction.editReply(`Adding **${sound.title}** to the queue`)
+            sound.title = sound.name;
+            sound.author = sound.user.name;
+            sound.duration = prettyMS(sound.durationInMs, { colonNotation: true });
+            sound.description = 
+            sound.views = sound.permalink;
+            sound.raw = {source: "soundcloud"}
+            let track = new Track(player, sound);
+            track.description = `${track.title} by ${track.author} on Soundcloud. Requested by <@${interaction.user.id}>`;
+            console.log(track)
+            if (!sound) return await interaction.followUp({ content: `❌ | Track **${query}** not found!` });
+            if (queue.nowPlaying() == null) await queue.play(track,  {immediate: true});
+            else queue.addTrack(track);
+            await interaction.editReply(`Added **${track.title}** to the queue`);
+
         } else { await interaction.reply('Sorry, I can only play links from Apple Music and YouTube for now'); }
         // consola.success(queue.tracks);
     }
