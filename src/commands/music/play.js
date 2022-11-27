@@ -135,7 +135,7 @@ export const command = {
             await interaction.reply(`Connecting to SoundCloud API...`);
             // await authorization('y')
             let sound = await soundcloud(query)
-            await interaction.editReply(`Adding **${sound.title}** to the queue`)
+            await interaction.editReply(`Adding **${sound.name}** to the queue`)
             sound.title = sound.name;
             sound.author = sound.user.name;
             sound.duration = prettyMS(sound.durationInMs, { colonNotation: true });
