@@ -5,6 +5,8 @@ import { Player } from 'discord-player';
 import { readdirSync } from 'fs';
 import { getColorFromURL } from 'color-thief-node';
 import { getAPIToken } from "./integrations/musickitAPI.js";
+import { initializeSoundCloud } from './integrations/playdl.js'
+// import { db } from "./integrations/firebase.js"
 let prompts = (await import("./data/prompts.json", { assert: { type: "json" } })).default;
 let reassure = (await import("./data/reassurance.json", { assert: { type: "json" } })).default;
 let welcome = (await import("./data/welcome.json", { assert: { type: "json" } })).default;
@@ -44,12 +46,10 @@ for (const folder of commandFolders) {
 client.on("ready", () => {
     consola.success(`Logged in as ${client.user.tag} at ${Date()}`);
     client.user.setActivity(`Writers Guild`, { type: ActivityType.Listening });
+    initializeSoundCloud();
 
 });
 
-function sendWelcomeMessgae(id) {
-
-}
 
 
 
@@ -139,6 +139,13 @@ client.on("messageCreate", async (message) => {
             ephemeral: true,
         }).then((m) => setTimeout(() => { m.delete(); message.delete() }, 5000));
         return message.channel.send(reassure[Math.floor(Math.random() * reassure.length)]);
+    // } else if(message.content.includes("yaz")) {
+    //     const test12 = await db.collection('yaz').doc('penny-bot').collection('confession').doc('counters').get();
+    //     if (!test12.exists) {
+    //         console.log('No such document!');
+    //       } else {
+    //         console.log('Document data:', test12.data());
+    //       }
     }
 });
 

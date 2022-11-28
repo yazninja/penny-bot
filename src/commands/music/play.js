@@ -3,7 +3,6 @@ import { MusicKit as MusicKitHeader } from '../../data/headers.js';
 import fetch from 'node-fetch';
 import { QueryType, Track } from 'discord-player';
 import { default as prettyMS } from 'pretty-ms';
-
 import { stream, soundcloud, authorization, SoundCloudTrack, SoundCloudPlaylist } from 'play-dl'
 import { searchMusics } from 'node-youtube-music';
 import 'dotenv/config';
@@ -150,7 +149,9 @@ export const command = {
             else queue.addTrack(track);
             await interaction.editReply(`Added **${track.title}** to the queue`);
 
-        } else { await interaction.reply('Sorry, I can only play links from Apple Music and YouTube for now'); }
+        } else if (query.startsWith('https://open.spotify.com/')) {
+            
+        } else { await interaction.reply('Sorry, I can only play links from Apple Music, Soundcloud, Spotify and YouTube for now'); }
         // consola.success(queue.tracks);
     }
 }
@@ -201,5 +202,3 @@ async function getAppleMusicPlaylistName(link, amAPIToken) {
     }
     return appleMusic.data[0].attributes.name;
 }
-
-// write something that will make me cry
