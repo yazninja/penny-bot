@@ -7,3 +7,4 @@ yarn.lock
 .idea/
 leaks.json
 headers.js
+config.json
