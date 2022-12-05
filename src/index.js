@@ -110,11 +110,11 @@ client.on("messageCreate", async (message) => {
     if(message.channelId === process.env.OPENAI_CHANNEL && message.content.match(/hey penny/gi)) {
         try {
             let prompt = message.content.replace(/hey penny,/gi, "").replace(/hey penny/gi, "");
-            await message.react(':thinking:');
+            await message.react('🤔');
             consola.info("\x1b[32m%s\x1b[0m", "Prompt:", prompt)
             let response = await client.chatbot.ask(prompt);
             await message.reactions.removeAll();
-            await message.react(':white_check_mark:');
+            await message.react('✅');
             let embed = new EmbedBuilder()
                 .setAuthor({ name: "OpenAI ChatGPT", iconURL: client.user.avatarURL()})
                 .setTitle(prompt)
@@ -130,10 +130,10 @@ client.on("messageCreate", async (message) => {
         console.log(random);
         if(random == 1) {
             try {
-                await message.react(':thinking:');
+                await message.react('🤔');
                 let response = await client.chatbot.ask(message.content);
                 await message.reactions.removeAll();
-                await message.react(':white_check_mark:');
+                await message.react('✅');
                 let embed = new EmbedBuilder()
                 .setAuthor({ name: "OpenAI ChatGPT", iconURL: client.user.avatarURL()})
                 .setTitle(message.content)
