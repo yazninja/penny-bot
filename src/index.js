@@ -6,8 +6,7 @@ import { readdirSync } from 'fs';
 import { getColorFromURL } from 'color-thief-node';
 import { getAPIToken } from "./integrations/musickitAPI.js";
 import { initializeSoundCloud } from './integrations/playdl.js'
-import ChatBot from "chatgpt-lib";
-import config from '../config.json' assert { type: "json" };
+import { ChatGPT } from "./lib/openai.js";
 // import { db } from "./integrations/firebase.js"
 let prompts = (await import("./data/prompts.json", { assert: { type: "json" } })).default;
 let reassure = (await import("./data/reassurance.json", { assert: { type: "json" } })).default;
@@ -27,7 +26,9 @@ const client = new Client({
     partials: [Partials.Channel, Partials.Message, Partials.User, Partials.GuildMember, Partials.Reaction]
 });
 client.player = new Player(client, { ytdlOptions: { quality: 'highestaudio' } });
-client.chatbot = new ChatBot.ChatGPT(config);
+client.chatbot = new ChatGPT({ sessionToken: process.env.SESSION_TOKEN });
+client.accessToken = null;
+client.openAILogo = 'https://openai.com/content/images/2022/05/openai-avatar.png'
 client.amAPIToken = await getAPIToken();
 client.commands = new Collection();
 
@@ -50,6 +51,16 @@ client.on("ready", () => {
     consola.success(`Logged in as ${client.user.tag} at ${Date()}`);
     client.user.setActivity(`Writers Guild`, { type: ActivityType.Listening });
     initializeSoundCloud();
+    client.chatbot.refreshAccessToken().then(token => {
+        client.accessToken = token;
+        consola.success("Generated new access token");
+    }).catch(err => consola.error(err));
+    setInterval(async () => {
+        client.chatbot.refreshAccessToken().then(token => {
+            client.accessToken = token
+            consola.success("Refreshed access token - " + client.accessToken);
+        }).catch(err => consola.error(err));
+    }, 1000 * 60); //refresh access token every 1 minute
 
 });
 
@@ -107,44 +118,55 @@ client.on('interactionCreate', async interaction => {
 
 client.on("messageCreate", async (message) => {
     if (message.author.bot) return;
-    if(message.channelId === process.env.OPENAI_CHANNEL && message.content.match(/hey penny/gi)) {
+    if ((message.channelId === process.env.OPENAI_CHANNEL) && message.content.match(/hey penny/gi)) {
         try {
-            let prompt = message.content.replace(/hey penny,/gi, "").replace(/hey penny/gi, "");
             await message.react('🤔');
-            consola.info("\x1b[32m%s\x1b[0m", "Prompt:", prompt)
-            let response = await client.chatbot.ask(prompt);
-            await message.reactions.removeAll();
-            await message.react('✅');
-            let embed = new EmbedBuilder()
-                .setAuthor({ name: "OpenAI ChatGPT", iconURL: client.user.avatarURL()})
-                .setTitle(prompt)
-                .setDescription(response)
-                .setColor("Gold")
-                .setTimestamp()
-            message.reply({ embeds: [embed] });
-        } catch (error) {
-            consola.error(error);
-        }
-    } else if(message.content.endsWith("?")) {
-        let random = Math.floor(Math.random() * 4) + 1;
-        console.log(random);
-        if(random == 1) {
-            try {
-                await message.react('🤔');
-                let response = await client.chatbot.ask(message.content);
+            let prompt = message.content.replace(/hey penny,/gi, "").replace(/hey penny/gi, "");
+            prompt = prompt.trim()
+            prompt = prompt.charAt(0).toUpperCase() + prompt.slice(1);
+            await client.chatbot.send(client.accessToken, prompt).then(async response => {
                 await message.reactions.removeAll();
                 await message.react('✅');
                 let embed = new EmbedBuilder()
-                .setAuthor({ name: "OpenAI ChatGPT", iconURL: client.user.avatarURL()})
-                .setTitle(message.content)
-                .setDescription(response)
-                .setColor("Gold")
-                .setTimestamp()
+                    .setAuthor({ name: "OpenAI ChatGPT", iconURL: client.openAILogo })
+                    .setTitle(prompt)
+                    .setDescription(response.message)
+                    .setColor("Gold")
+                    .setFooter({ text: `Requested by ${message.author.tag} | ${response.id.split("-")[0]}`, iconURL: message.author.avatarURL() })
+                    .addFields({ name: "Conversation ID", value: `${response.conversationId}`, inline: true })
+                    .setTimestamp()
+                message.reply({ embeds: [embed] });
+            }).catch(async err => {
+                consola.error(err)
+                await message.reactions.removeAll();
+                await message.react('❌');
+                await message.reply({ content: "Something went wrong, please try again later." + err.name.split(" ")[err.name.split(" ").length - 1] });
+
+            })
+        } catch (error) {
+            consola.error(error);
+        }
+    } else if (message.content.endsWith("?")) {
+        let random = Math.floor(Math.random() * 10) + 1; // 10% chance of replying
+        console.log(random);
+        if (random == 1) {
+            try {
+                let response = await client.chatbot.send(client.accessToken, message.content);
+                console.log(response)
+                if (response.startsWith("I'm sorry")) return;
+                let embed = new EmbedBuilder()
+                    .setAuthor({ name: "OpenAI ChatGPT", iconURL: client.openAILogo })
+                    .setTitle(prompt)
+                    .setDescription(response.message)
+                    .setColor("Gold")
+                    .setFooter({ text: `Requested by ${message.author.tag} | ${response.id.split("-")[0]}`, iconURL: message.author.avatarURL() })
+                    .addFields({ name: "Conversation ID", value: `${response.conversationId}`, inline: true })
+                    .setTimestamp()
                 message.reply({ embeds: [embed] });
             } catch (error) {
                 consola.error(error);
             }
-            
+
 
         }
     }else if (message.content === "Hello") {
