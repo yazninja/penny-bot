@@ -28,6 +28,7 @@ const client = new Client({
 client.player = new Player(client, { ytdlOptions: { quality: 'highestaudio' } });
 client.chatbot = new ChatGPT({ sessionToken: process.env.SESSION_TOKEN });
 client.accessToken = null;
+client.chatSessions = new Map();
 client.openAILogo = 'https://openai.com/content/images/2022/05/openai-avatar.png'
 client.amAPIToken = await getAPIToken();
 client.commands = new Collection();
