@@ -8,3 +8,4 @@ yarn.lock
 leaks.json
 headers.js
 config.json
+build/
