@@ -13,14 +13,21 @@ export default {
                 console.error(error);
                 interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
             }
-        } else if(interaction.isModalSubmit()) {
-            console.log(interaction.customId)
+        } else if (interaction.isButton()) {
+            const command = interaction.client.commands.get(interaction.customId);
+            if (!command) return;
+            try {
+                command.execute(interaction);
+            } catch (error) {
+                console.error(error);
+            }
+        } else if (interaction.isModalSubmit()) {
+            console.log(interaction.customId);
             const command = interaction.client.commands.get(interaction.customId);
             if (!command) return;
             try {
                 command.recieve(interaction);
-            }
-            catch (error) {
+            } catch (error) {
                 console.error(error);
             }
         } else if (interaction.isAutocomplete()) {
@@ -28,8 +35,7 @@ export default {
             if (!command) return;
             try {
                 command.autocomplete(interaction);
-            }
-            catch (error) {
+            } catch (error) {
                 console.error(error);
             }
         }
