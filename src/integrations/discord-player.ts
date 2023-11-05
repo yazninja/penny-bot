@@ -9,7 +9,6 @@ export const playerEvents = (player: Player) => {
     player.events.on('error', (queue, error) => consola.error(error));
     player.events.on('playerStart', async (queue, track) => {
         let metadata = queue.metadata as any;
-        consola.info(metadata);
         if (metadata.interval) clearInterval(metadata.interval);
         if (metadata.embed) metadata.embed.delete().catch((e: Error) => console.log(`Failed to delete embed for ${queue.guild} - Finished`));
         let embed = await metadata.channel.send({ embeds: nowPlayingEmbed(queue, track), components: nowPlayingComponents(queue) }).catch((e: Error) => {
@@ -83,6 +82,18 @@ export const playerEvents = (player: Player) => {
         if (metadata.embed) metadata.embed.delete().catch((e: Error) => console.log(`Failed to delete embed for ${queue.guild} - Finished`));
         delete metadata.interval;
         delete metadata.embed;
+    });
+    player.events.on('queueDelete', (queue) => {
+        let metadata = queue.metadata as any;
+        clearInterval(metadata.interval);
+        if (metadata.embed) metadata.embed.delete().catch((e: Error) => console.log(`Failed to delete embed for ${queue.guild} - Deleted`));
+        delete metadata.interval;
+        delete metadata.embed;
+    });
+    player.events.on('willAutoPlay', (queue, tracks, done) => {
+        let metadata = queue.metadata as any;
+        metadata.channel.send({ content: `Autoplaying ${tracks[0].title} by ${tracks[0].author}` });
+        done(null);
     });
     return player;
 };
