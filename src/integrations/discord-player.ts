@@ -115,7 +115,6 @@ export function nowPlayingComponents(queue: GuildQueue) {
         action: 'loop',
         emoji: '🔁'
     };
-    console.info('Track Size:', queue.tracks.size);
     switch (queue.repeatMode) {
         case QueueRepeatMode.OFF:
             loopButton.emoji = '🔁';
