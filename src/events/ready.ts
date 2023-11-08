@@ -15,7 +15,6 @@ export default {
         if (process.env.NODE_ENV === 'development') return client.user.setPresence({ activities: [{ name: '⚙️ in development' }], status: 'idle' });
         let guild = client.guilds.cache.get(WGServers.main);
         try {
-            happyBirthday(new Date('Aug 7 05:'), guild as Guild);
             await (client.channels.cache.get(WGChannels.botLog) as TextChannel).send({ embeds: [{ description: `<t:${Math.floor(Date.now() / 1000)}:R> | **${client.user.username} has started up!**`, color: 0x00ff00 }] });
             client.user.setActivity('Writers Guild', { type: ActivityType.Watching });
             happyBirthday(new Date(), guild as Guild);
