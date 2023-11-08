@@ -13,7 +13,9 @@ export default {
                 iconURL: member.client.user.displayAvatarURL()
             })
             .setThumbnail(member.user.displayAvatarURL())
-            .setDescription(`I am Penny and welcome to the server, <@${member.user.id}>. Please read the rules and regulations in <#${WGChannels.rules}> and introduce yourselves in <#${WGChannels.introduction}>!`)
+            .setDescription(
+                `I am Penny and welcome to the server, <@${member.user.id}>. Please read the rules and regulations in <#${WGChannels.rules}> and introduce yourselves in <#${WGChannels.introduction}>, feel free to set your birthdays in <#${WGChannels.birthdays}> for penny to greet you!`
+            )
             .setFooter({ text: welcome[Math.floor(Math.random() * welcome.length)], iconURL: member.guild.iconURL() || member.client.user.displayAvatarURL() });
         await channel.send({ embeds: [newEmbed] });
     }

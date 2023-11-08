@@ -15,7 +15,8 @@ declare global {
         freedomWall = '1166357727082192906',
         ventWall = '1166357767058112552',
         reassurance = '1166357679028051989',
-        introduction = '1165936752389795844'
+        introduction = '1165936752389795844',
+        birthdays = '1166357213644857474'
     }
     const enum WGCommands {
         prompt = '1167791957242826824',
@@ -25,7 +26,8 @@ declare global {
         play = '1167822131875291296',
         playNext = '1167851585079099585',
         lyrics = '1167851585079099584',
-        queue = '1167851585079099587'
+        queue = '1167851585079099587',
+        setBirthday = '1171869732018864179'
     }
     const enum WGMessage {
         confessionCount = '1167796580234051655',

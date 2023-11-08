@@ -3,11 +3,11 @@
     "ignore": ["node_modules/"],
     "watch": ["src/"],
     "execMap": {
-      "ts": "ts-node-esm --files"
+        "ts": "node --loader ts-node/esm --trace-warnings"
     },
     "env": {
-      "NODE_ENV": "development",
-      "CONSOLA_LEVEL": 5
+        "NODE_ENV": "development",
+        "CONSOLA_LEVEL": 5
     },
     "ext": "js,json,ts"
-  }
+}
