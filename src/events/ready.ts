@@ -37,13 +37,12 @@ async function happyBirthday(date: Date, guild: Guild) {
 
     let users = await kv.smembers(`WG_birthday_${month}-${day}:${hour}`);
     let channel = guild.channels.cache.get(WGChannels.birthdays) as TextChannel;
-
     for (let user of users) {
         let embed = new EmbedBuilder()
             .setColor(guild.members.cache.get(user)?.displayColor || 'Random')
             .setDescription(birthdayGreetings[Math.floor(Math.random() * birthdayGreetings.length)].replace('$USER', `<@${user}>`))
             .setTimestamp();
 
-        channel.send({ content: `<@${user}> :birthday:`, embeds: [embed] });
+        await channel.send({ content: `<@${user}> :birthday:`, embeds: [embed] });
     }
 }
