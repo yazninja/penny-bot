@@ -20,7 +20,7 @@ export default {
             happyBirthday(new Date(), guild as Guild);
             setInterval(() => {
                 happyBirthday(new Date(), guild as Guild);
-            }, 60000);
+            }, 60000 * 60);
         } catch (error) {
             consola.error(error);
         }

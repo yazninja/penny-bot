@@ -44,7 +44,7 @@ export const client = new Client({
 
 client.confessionCount = 0;
 client.ventCount = 0;
-client.player = new Player(client, { skipFFmpeg: false });
+client.player = new Player(client);
 await client.player.extractors.loadDefault();
 client.commands = new Collection();
 client.replies = new Collection();
