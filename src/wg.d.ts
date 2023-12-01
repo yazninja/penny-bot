@@ -17,6 +17,7 @@ declare global {
         reassurance = '1166357679028051989',
         introduction = '1165936752389795844',
         birthdays = '1166357213644857474'
+        starboard = '1180125888965259304'
     }
     const enum WGCommands {
         prompt = '1167791957242826824',
