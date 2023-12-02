@@ -16,8 +16,9 @@ declare global {
         ventWall = '1166357767058112552',
         reassurance = '1166357679028051989',
         introduction = '1165936752389795844',
-        birthdays = '1166357213644857474'
-        starboard = '1180125888965259304'
+        birthdays = '1166357213644857474',
+        starboard = '1180125888965259304',
+        tools = '1166581987272822804'
     }
     const enum WGCommands {
         prompt = '1167791957242826824',

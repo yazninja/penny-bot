@@ -9,3 +9,4 @@ leaks.json
 headers.js
 config.json
 build/
+serviceAccountKey.json
